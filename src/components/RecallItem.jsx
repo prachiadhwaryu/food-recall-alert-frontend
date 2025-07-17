@@ -1,7 +1,7 @@
 import React from 'react';
 import "../css/RecallList.css";
 
-const RecallItem = ({ recall }) => {
+const RecallItem = ({ recall, serial }) => {
     const formatDate = (rawDate) => {
     if (!rawDate || rawDate.length !== 8) return rawDate;
     const year = rawDate.substring(0, 4);
@@ -11,14 +11,9 @@ const RecallItem = ({ recall }) => {
   };
 
   return (
-    <div /*style={{
-      border: '1px solid #ccc',
-      borderRadius: '10px',
-      padding: '1rem',
-      marginBottom: '1rem',
-      backgroundColor: '#f9f9f9',
-    }}*/ className="recall-card">
-      <h3>{recall.productDescription || 'Unnamed Product'}</h3>
+    <div className="recall-card">
+      
+      <h3><span className="recall-serial">{serial}.  </span>{recall.productDescription || 'Unnamed Product'}</h3>
       <p><strong>Reason:</strong> {recall.reasonForRecall}</p>
       <p><strong>Company:</strong> {recall.recallingFirm}</p>
       <p><strong>State:</strong> {recall.distributionPattern}</p>

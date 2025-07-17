@@ -2,11 +2,13 @@ import React, {useEffect} from 'react';
 import { useState } from "react";
 import { US_STATES } from '../src/constants/usStates';
 import RecallList from './components/RecallList';
+import Spinner from './components/Spinner';
 import axios from 'axios';
 import './css/RecallList.css';
 
 function App() {
   const [recalls, setRecalls] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedState, setSelectedState] = useState("");
 
   useEffect (() => {
@@ -16,9 +18,10 @@ function App() {
         if (selectedState) {
           url += `?state=${selectedState}`;
         }
-        
+        setLoading(true);
         const res = await axios.get(url);
         setRecalls(res.data);
+        setLoading(false);
       } catch (error) {
         console.error('Error fetching recall data:', error);
       }
@@ -53,7 +56,7 @@ return (
         flexDirection: 'column',
       }}>
         <main style={{ flex: '1', padding: '2rem' }}>
-          <RecallList recalls={recalls} />
+          {loading ? <Spinner /> : <RecallList recalls={recalls} />}
         </main>
         <footer >
           © 2025 Food Recall Tracker | Data from FDA.gov
@@ -64,24 +67,3 @@ return (
 }
 
 export default App;
-
-   
-/*function RecallList({ recalls }) {
-  return (
-    <div>
-      <h2>Recall List</h2>
-      {recalls.length === 0 ? (
-        <p>No recalls found for selected state.</p>
-      ) : (
-        recalls.map((recall, index) => (
-          <div key={index} className="recall-card">
-            <p><strong>Product:</strong> {recall.productDescription}</p>
-            <p><strong>Reason:</strong> {recall.reasonForRecall}</p>
-            <p><strong>Firm:</strong> {recall.recallingFirm}</p>
-            <p><strong>Date:</strong> {recall.recallInitiationDate}</p>
-          </div>
-        ))
-      )}
-    </div>
-  );
-}*/

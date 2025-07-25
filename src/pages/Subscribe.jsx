@@ -25,13 +25,19 @@ function Subscribe() {
             state
             });
 
-            setMessage("Subscription successful!");
-            setMessageType("success");
-            setEmail("");
-            setState("");
+            if(response.status === 201) {
+                setMessage(email + " successfully subscribed for food recall alerts!");
+                setMessageType("success");
+                setEmail("");
+                setState("");
+            }
         } catch (error) {
             if (error.response && error.response.data && error.response.data.message) {
                 setMessage(error.response.data.message); // Validation error
+            } else if (error.response && error.response.status === 409) {
+                setMessage(email + " is already subscribed for food recall alerts.");  // Conflict error
+                setEmail(""); 
+                setState("");
             } else {
                 setMessage("Something went wrong. Please try again.");
             }

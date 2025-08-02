@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../../css/AdminSubscribers.css';
 import { US_STATES } from '../../constants/usStates';
+import { CSVLink } from 'react-csv';
 
 
 const ViewSubscribers = () => {
@@ -28,6 +29,13 @@ const ViewSubscribers = () => {
 
     const currentSubscribers = filteredSubscribers.slice(indexOfFirstItem, indexOfLastItem);
 
+    const processedSubscribers = subscribers.map(sub => ({
+        id: sub.id,
+        email: sub.email,
+        state: US_STATES.find(state => state.code === sub.state)?.name || sub.state,
+        subscribedDate: new Date(sub.subscribedAt).toLocaleDateString(),
+    }));
+
 
     useEffect(() => {
         const fetchSubscribers = async () => {
@@ -48,7 +56,8 @@ const ViewSubscribers = () => {
     return (
         <div className='subscribers-container'>
             <h2 className='subscribers-title'>Subscribed Users</h2>
-
+            
+            <div className="top-controls">
             <input
                 type="text"
                 placeholder="Search by email or state"
@@ -56,6 +65,22 @@ const ViewSubscribers = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="search-input"
             />
+
+            <CSVLink
+                data={processedSubscribers}
+                headers={[
+                    { label: "Id", key: "id" },
+                    { label: "Email", key: "email" },
+                    { label: "State", key: "state" },
+                    { label: "Subscribed Date", key: "subscribedDate" }
+                ]}
+                filename={"subscribers.csv"}
+                className="export-button"
+            >
+                Export to CSV
+            </CSVLink>
+            </div>
+
 
             {loading && <p>Loading...</p>}
             {error && <p className='subscribers-error'>{error}</p>}

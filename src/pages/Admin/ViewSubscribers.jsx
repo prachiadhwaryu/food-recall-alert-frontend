@@ -10,14 +10,24 @@ const ViewSubscribers = () => {
     const [error, setError] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(10);
+    const [searchTerm, setSearchTerm] = useState('');
 
     // Calculate indexes
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentSubscribers = subscribers.slice(indexOfFirstItem, indexOfLastItem);
+    // Filter subscribers based on search term
+    const filteredSubscribers = subscribers.filter((sub) => {
+        const fullStateName = US_STATES.find(state => state.code === sub.state)?.name || '';
+        return (
+            sub.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            fullStateName.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+    });
 
-    // Total pages
-    const totalPages = Math.ceil(subscribers.length / itemsPerPage);
+    const totalPages = Math.ceil(filteredSubscribers.length / itemsPerPage);
+
+    const currentSubscribers = filteredSubscribers.slice(indexOfFirstItem, indexOfLastItem);
+
 
     useEffect(() => {
         const fetchSubscribers = async () => {
@@ -38,6 +48,14 @@ const ViewSubscribers = () => {
     return (
         <div className='subscribers-container'>
             <h2 className='subscribers-title'>Subscribed Users</h2>
+
+            <input
+                type="text"
+                placeholder="Search by email or state"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-input"
+            />
 
             {loading && <p>Loading...</p>}
             {error && <p className='subscribers-error'>{error}</p>}
@@ -61,7 +79,7 @@ const ViewSubscribers = () => {
                         <tbody>
                             {currentSubscribers.map((sub, index) => (
                                 <tr key={index}>
-                                    <td>{index+1}</td>
+                                    <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                                     <td>{sub.id}</td>
                                     <td>{sub.email}</td>
                                     <td>{US_STATES.find(state => state.code === sub.state)?.name || sub.state}</td>
